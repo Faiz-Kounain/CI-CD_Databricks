@@ -1,0 +1,32 @@
+bundle:
+  name: ci-cd-demo
+
+variables:
+  schema:
+    default: dev_sales
+
+resources:
+  jobs:
+    daily_sales_job:
+      name: daily_sales_job_${bundle.target}
+      tasks:
+        - task_key: build
+          spark_python_task:
+            python_file: src/build_daily_sales.py
+            parameters: ["${var.schema}"]
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
+
+targets:
+  dev:
+    mode: development
+    default: true
+    variables:
+      schema: dev_sales
+  prod:
+    mode: production
+    variables:
+      schema: prod_sales
