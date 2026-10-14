@@ -28,5 +28,7 @@ targets:
       schema: dev_sales
   prod:
     mode: production
+    workspace:
+      root_path: /Workspace/Users/fk81307@gmail.com/.bundle/${bundle.name}/${bundle.target}
     variables:
       schema: prod_sales
