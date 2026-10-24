@@ -433,6 +433,17 @@ Part 2: How I did it in my project
 CI/CD is how code goes from a developer’s laptop to production automatically and safely. I make changes on a feature branch, push to GitHub and open a pull request. That triggers CI: a GitHub Actions workflow installs the dependencies, runs linting and the pytest unit tests, and validates the bundle. If everything passes, another developer reviews and approves the PR, and it’s merged to main.
 
 The merge triggers CD: a second workflow runs databricks bundle deploy. The job’s notebooks, task order and cluster settings are all defined in databricks.yml, so the job is created or updated automatically, first in dev and then in prod. Nobody changes jobs by hand in the UI, so every change is reviewed, tested and traceable.”
+| File                      | Is it DAB?                               | What it does                                                                                | Who reads it                                |
+| ------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `databricks.yml`          | ✅ **Yes, this is the DAB (bundle) file** | **WHAT** to deploy: the job, its notebooks/tasks, task order, cluster, and dev/prod targets | Databricks CLI (`databricks bundle deploy`) |
+| `.github/workflows/*.yml` | ❌ No, this is **GitHub Actions**         | **WHEN and HOW** to run: on a PR, run pytest. On merge to main, run `bundle deploy`         | GitHub                                      |
+
+
+
+
+
+just give plain md text text
+
 ```
 Here are the CI/CD questions interviewers usually ask, with short answers 👇
 
