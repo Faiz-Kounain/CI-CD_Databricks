@@ -421,3 +421,43 @@ databricks bundle generate job --existing-job-id <id>   # turn a UI job into YAM
 
 ## 16. Interview answer
 "We keep jobs as code with Databricks Asset Bundles and develop on feature branches in Git folders. A Pull Request triggers CI: pytest on pure PySpark functions, linting, and `bundle validate`. After review and merge, CD deploys to QA automatically and to prod after a manual approval, using a service principal with least privilege, with secrets from Key Vault or OIDC. Environments are separate workspaces or catalogs, large projects split jobs into one YAML per job and bundles per domain, and nobody changes prod by hand."
+
+
+Part 1: What is CI/CD
+🗣️ “CI/CD automates how code goes from a developer’s laptop to production.
+• CI (Continuous Integration): every time someone pushes code or opens a PR, it’s automatically checked (validated, tested, reviewed) before it’s merged. That catches problems early.
+• CD (Continuous Delivery/Deployment): once code is merged, it’s deployed automatically and the same way every time, first to dev and then, after approval, to prod.
+For data engineering, the main value is that pipelines are versioned, reviewed and repeatable. Nobody edits jobs by hand in the UI, so dev and prod stay the same, and you can always trace or roll back a change.”
+
+Part 2: How I did it in my project
+🗣️ “In my capstone, I built the Databricks pipeline and set up CI/CD with GitHub, GitHub Actions and Databricks Asset Bundles.
+1. Code as source of truth: the notebooks and the job definitions (tasks, dependencies, cluster settings) were in a GitHub repo. The job was defined in databricks.yml, so the workflow itself was code, not clicks. I used dev and prod targets so the same code deploys with different settings.
+2. Branching: I worked on a feature branch and merged into main through a pull request.
+3. CI: a GitHub Actions workflow ran on the PR and did databricks bundle validate, which catches config errors before merge.
+4. CD: on merge to main, a second workflow ran databricks bundle deploy to the target workspace, which created or updated the job automatically.
+5. Authentication: I connected GitHub to Databricks with a Git token for repo sync. For the pipeline, I stored the Databricks host and token as encrypted GitHub Actions secrets, so there were no credentials in the code.”
+```
+Here are the CI/CD questions interviewers usually ask, with short answers 👇
+
+**Basics**
+1. **CI vs Continuous Delivery vs Continuous Deployment?** CI = auto-check every change. Delivery = always ready to deploy, but prod needs a manual approval. Deployment = goes to prod automatically.
+2. **Why CI/CD for data pipelines?** No manual UI edits, the same code in dev and prod, every change is reviewed and traceable, and rollback is easy.
+3. **What are Databricks Asset Bundles?** A way to define jobs, clusters and notebooks as code in `databricks.yml`, then `validate` and `deploy` them with the CLI.
+
+**Your project**
+4. **What happens when you open a PR?** GitHub Actions runs `bundle validate` (plus tests if you add them). The merge happens only if the checks pass.
+5. **What happens on merge to main?** A workflow runs `databricks bundle deploy`, which creates or updates the job.
+6. **How did GitHub Actions log in to Databricks?** With the host and token stored as encrypted GitHub secrets, which are read as environment variables.
+7. **How do you deploy to different environments?** With bundle **targets** (dev and prod), each with its own workspace, settings and parameters.
+
+**Senior level ⭐**
+8. **Why not use a personal token in prod?** It's tied to one person, it expires, and it has too much access. Use a service principal with OIDC instead.
+9. **How do you test PySpark code?** Use pytest with a small SparkSession, build input DataFrames, and compare the expected and actual output. Add data quality checks too.
+10. **A deployment broke prod. What do you do?** Roll back by redeploying the last good commit, find the root cause, and add a test or check that would have caught it.
+11. **How do you stop someone deploying untested code?** Use branch protection, required reviewers, required status checks and a manual approval for prod.
+12. **How do you manage secrets in notebooks?** Use Databricks secret scopes with `dbutils.secrets.get()`, never hardcoded values.
+13. **What's your branching strategy?** Feature branches, PRs to main, and main is always deployable (trunk-based). Use release tags if needed.
+14. **Bundles vs Terraform?** Bundles handle the jobs and code. Terraform handles the workspace infrastructure (workspaces, catalogs, permissions).
+
+
+```
