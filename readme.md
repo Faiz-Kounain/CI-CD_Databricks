@@ -430,12 +430,9 @@ Part 1: What is CI/CD
 For data engineering, the main value is that pipelines are versioned, reviewed and repeatable. Nobody edits jobs by hand in the UI, so dev and prod stay the same, and you can always trace or roll back a change.”
 
 Part 2: How I did it in my project
-🗣️ “In my capstone, I built the Databricks pipeline and set up CI/CD with GitHub, GitHub Actions and Databricks Asset Bundles.
-1. Code as source of truth: the notebooks and the job definitions (tasks, dependencies, cluster settings) were in a GitHub repo. The job was defined in databricks.yml, so the workflow itself was code, not clicks. I used dev and prod targets so the same code deploys with different settings.
-2. Branching: I worked on a feature branch and merged into main through a pull request.
-3. CI: a GitHub Actions workflow ran on the PR and did databricks bundle validate, which catches config errors before merge.
-4. CD: on merge to main, a second workflow ran databricks bundle deploy to the target workspace, which created or updated the job automatically.
-5. Authentication: I connected GitHub to Databricks with a Git token for repo sync. For the pipeline, I stored the Databricks host and token as encrypted GitHub Actions secrets, so there were no credentials in the code.”
+CI/CD is how code goes from a developer’s laptop to production automatically and safely. I make changes on a feature branch, push to GitHub and open a pull request. That triggers CI: a GitHub Actions workflow installs the dependencies, runs linting and the pytest unit tests, and validates the bundle. If everything passes, another developer reviews and approves the PR, and it’s merged to main.
+
+The merge triggers CD: a second workflow runs databricks bundle deploy. The job’s notebooks, task order and cluster settings are all defined in databricks.yml, so the job is created or updated automatically, first in dev and then in prod. Nobody changes jobs by hand in the UI, so every change is reviewed, tested and traceable.”
 ```
 Here are the CI/CD questions interviewers usually ask, with short answers 👇
 
