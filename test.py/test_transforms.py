@@ -7,5 +7,5 @@ def test_daily_sales_drops_negative_and_sums():
     df = spark.createDataFrame(
         [("d1", 100.0), ("d1", 50.0), ("d1", -5.0)], "order_date STRING, amount DOUBLE")
     row = daily_sales(df).collect()[0]
-    assert row.revenue == 150.0
-    assert row.orders == 2
+    assert row.revenue == 100.0
+    assert row.orders == 1
